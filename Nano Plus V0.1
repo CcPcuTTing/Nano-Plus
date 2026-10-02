@@ -1,0 +1,107 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+
+struct Editor
+{
+    vector<string> buffer;
+};
+
+
+// 添加文本
+void insert_text(Editor *editor)
+{
+    string line;
+
+    while(true)
+    {
+        getline(cin, line);
+
+        if(line == ":q")
+            break;
+
+        if(line == ":w")
+            break;
+
+        if(line == ":del")
+        {
+            if(!editor->buffer.empty())
+                editor->buffer.pop_back();
+
+            continue;
+        }
+
+        editor->buffer.push_back(line);
+    }
+}
+
+
+// 保存文件
+void save_file(Editor *editor)
+{
+    string filename;
+
+    cout << "Save as (.txt/.nap): ";
+    cin >> filename;
+
+    cin.ignore();
+
+
+    ofstream file(filename);
+
+
+    if(!file)
+    {
+        cout << "Save failed!\n";
+        return;
+    }
+
+
+    // Nano Plus格式
+    if(filename.size() >= 4 &&
+       filename.substr(filename.size()-4)==".nap")
+    {
+        file << "NAP1\n";
+        file << "[NanoPlus]\n\n";
+    }
+
+
+    for(size_t i = 0; i < editor->buffer.size(); i++)
+    {
+        file << editor->buffer[i] << "\n";
+    }
+
+
+    file.close();
+
+    cout << "Saved!\n";
+}
+
+
+
+int main()
+{
+    Editor editor;
+
+
+    cout << "====================\n";
+    cout << " Nano Plus v0.1 C (α version)\n";
+    cout << "====================\n";
+
+    cout << "输入 :w 保存\n";
+    cout << "输入 :q 退出\n";
+    cout << "输入 :del 删除上一行\n";
+
+
+    insert_text(&editor);
+
+
+    save_file(&editor);
+
+
+    return 0;
+}
